@@ -12,35 +12,33 @@ type DataType string
 const (
 	//StringDataType is the string data type
 	StringDataType DataType = "string"
+	//BitMapDataType is the bitmap data type. Stored as int64 integer
+	BitMapDataType DataType = "bitmap"
+	//ListDataType is the list data type. Stored as slice of string
+	ListDataType DataType = "list"
+	//MapDataType is the hash map type. Stored as map[string][string]
+	MapDataType DataType = "map"
 )
 
+func (dt DataType) String() string {
+	return string(dt)
+}
+
 //Key represents key to value
-type Key struct {
-	value    string
+type Key string
+
+//Value represents a single value of a storage
+type Value struct {
+	data     interface{}
 	dataType DataType
 }
 
-//Val returns value of key
-func (k Key) Val() string {
-	return k.value
-}
-
-//NewStringKey creates a new key with StringDataType
-func NewStringKey(key string) Key {
-	return Key{
-		value:    key,
-		dataType: StringDataType,
-	}
-}
-
-//Value represents stored data
-type Value interface{}
-
 //Storage represents storage
 type Storage interface {
-	Put(Key, Value) error
-	Get(Key) (Value, error)
-	Del(Key) error
-	GetKey(string) (Key, error)
+	Put(key Key, setter ValueSetter) error
+	Get(key Key) (*Value, error)
+	Del(key Key) error
 	Keys() ([]Key, error)
 }
+
+type ValueSetter func(old *Value) (new *Value, err error)
