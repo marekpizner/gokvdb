@@ -1,10 +1,7 @@
 package command
 
 import (
-	"bytes"
 	"errors"
-	"strings"
-	"unicode"
 
 	"github.com/khan745/gokvdb/internal/pkg/storage"
 )
@@ -18,56 +15,25 @@ var (
 	ErrWrongTypeOp = errors.New("command: wrong type operation")
 )
 
-var commands = make(map[string]Command)
-
 type Command interface {
 	Name() string
 
 	Help() string
 
-	ValidateArgs(args ...string) error
-
-	Execute(strg storage.Storage, args ...string) Result
+	Execute(args ...string) Result
 }
 
-func extractArgs(val string) []string {
-	args := make([]string, 0)
-	var inQuote bool
-	var buf bytes.Buffer
-	for _, r := range []rune(val) {
-		switch {
-		case r == '"':
-			inQuote = !inQuote
-		case unicode.IsSpace(r):
-			if !inQuote && buf.Len() > 0 {
-				args = append(args, buf.String())
-				buf.Reset()
-			} else {
-				buf.WriteRune(r)
-			}
-		default:
-			buf.WriteRune(r)
-		}
-	}
-	if buf.Len() > 0 {
-		args = append(args, buf.String())
-	}
-	return args
+type dataStore interface {
+	//Put puts a new value at the given Key.
+	Put(key storage.Key, sttr storage.ValueSetter) error
+	//Get gets a value by the given key.
+	Get(key storage.Key) (*storage.Value, error)
+	//Del deletes a value by the given key.
+	Del(key storage.Key) error
+	//Keys returns all stored keys.
+	Keys() ([]storage.Key, error)
 }
 
-func Parse(value string) (Command, []string, error) {
-	args := extractArgs(value)
-
-	cmd, ok := commands[strings.ToUpper(args[0])]
-	if !ok {
-		return nil, nil, ErrCommandNotFound
-	}
-
-	args = args[1:]
-
-	if err := cmd.ValidateArgs(args...); err != nil {
-		return nil, nil, err
-	}
-
-	return cmd, args, nil
+type commandParser interface {
+	Parse(str string) (cmd Command, args []string, err error)
 }

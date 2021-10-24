@@ -42,3 +42,42 @@ type Storage interface {
 }
 
 type ValueSetter func(old *Value) (new *Value, err error)
+
+func (v *Value) Data() interface{} {
+	return v.data
+}
+
+func (v *Value) Type() DataType {
+	return v.dataType
+}
+
+func NewString(str string) *Value {
+	return &Value{
+		data:     str,
+		dataType: StringDataType,
+	}
+}
+
+//NewBitMap creates a new value of the BitMapDataType. Stored as uint64 integer.
+func NewBitMap(value []uint64) *Value {
+	return &Value{
+		data:     value,
+		dataType: BitMapDataType,
+	}
+}
+
+//NewList creates a new value of the ListDataType. Stored as slice of strings.
+func NewList(data []string) *Value {
+	return &Value{
+		data:     data,
+		dataType: ListDataType,
+	}
+}
+
+//NewMap creates a new value of the MapDataType.
+func NewMap(val map[string]string) *Value {
+	return &Value{
+		data:     val,
+		dataType: MapDataType,
+	}
+}

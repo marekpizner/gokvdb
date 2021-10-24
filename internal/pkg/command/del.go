@@ -2,11 +2,9 @@ package command
 
 import "github.com/khan745/gokvdb/internal/pkg/storage"
 
-func init() {
-	commands["DEL"] = new(Del)
+type Del struct {
+	strg dataStore
 }
-
-type Del struct{}
 
 func (c *Del) Name() string {
 	return "DEL"
