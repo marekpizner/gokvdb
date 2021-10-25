@@ -22,7 +22,7 @@ If provided key does not exist NIL will be returned.`
 }
 
 //Execute implements Execute of Command interface
-func (c *Get) Execute(args ...string) Result {
+func (c *Get) Execute(args ...string) Response {
 	if len(args) != 1 {
 		return ErrResult{ErrWrongArgsNumber}
 	}

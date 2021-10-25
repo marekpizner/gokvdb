@@ -23,7 +23,7 @@ If key already holds a value, it is overwritten.`
 }
 
 //Execute implements Execute of Command interface
-func (c *Set) Execute(args ...string) Result {
+func (c *Set) Execute(args ...string) Response {
 	if len(args) != 2 {
 		return ErrResult{ErrWrongArgsNumber}
 	}

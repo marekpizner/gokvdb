@@ -23,7 +23,7 @@ func (c *Del) ValidateArgs(args ...string) error {
 }
 
 //Execute implements Execute of Command interface
-func (c *Del) Execute(strg storage.Storage, args ...string) Result {
+func (c *Del) Execute(strg storage.Storage, args ...string) Response {
 	err := strg.Del(storage.Key(args[0]))
 	if err != nil {
 		return ErrResult{err}

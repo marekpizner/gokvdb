@@ -20,7 +20,7 @@ type Command interface {
 
 	Help() string
 
-	Execute(args ...string) Result
+	Execute(args ...string) Response
 }
 
 type dataStore interface {

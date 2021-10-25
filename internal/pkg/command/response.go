@@ -1,6 +1,6 @@
 package command
 
-type Result interface {
+type Response interface {
 	// Val() interface{}
 }
 type ErrResult struct {

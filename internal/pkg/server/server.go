@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"net"
@@ -102,18 +103,14 @@ func handleMessage(message string, conn net.Conn) {
 			//  - minimock https://github.com/gojuno/minimock
 			if cmd != nil {
 				res := cmd.Execute(args...)
-				fmt.Println("Comand, arguments", cmd, args, res, message)
-				switch t := res.(type) {
-				case command.OkResult:
-					conn.Write([]byte("Command execute successfully\n"))
-				case command.StringReply:
-					conn.Write([]byte(t.Value + "\n"))
-				case command.ErrResult:
-					conn.Write([]byte("Something wen wrong with executing command\n"))
-				default:
-					fmt.Println("WTF")
-				}
+				apiRes := getApiResponseByResult(res)
+				apiResByt, err := json.Marshal(apiRes)
 
+				var apiResBytUncoded apiResponse
+				json.Unmarshal(apiResByt, apiResBytUncoded)
+
+				fmt.Println("Sending ", apiResByt, err, apiRes, apiResBytUncoded)
+				conn.Write(apiResByt)
 			} else {
 				conn.Write([]byte("Unrecognized command.\n"))
 			}
