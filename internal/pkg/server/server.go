@@ -109,7 +109,7 @@ func handleMessage(message string, conn net.Conn) {
 				var apiResBytUncoded apiResponse
 				json.Unmarshal(apiResByt, apiResBytUncoded)
 
-				fmt.Println("Sending ", apiResByt, err, apiRes, apiResBytUncoded)
+				fmt.Println("Sending:>", apiResByt, err, apiRes, apiResBytUncoded)
 				conn.Write(apiResByt)
 			} else {
 				conn.Write([]byte("Unrecognized command.\n"))
