@@ -5,9 +5,9 @@ import (
 )
 
 type apiResponse struct {
-	reply string
-	item  string
-	items []string
+	Reply string
+	Item  string
+	Items []string
 }
 
 func getApiResponseByResult(res command.Response) apiResponse {
@@ -15,14 +15,14 @@ func getApiResponseByResult(res command.Response) apiResponse {
 
 	switch t := res.(type) {
 	case command.OkResult:
-		apiRes.reply = "OK"
+		apiRes.Reply = "OK"
 	case command.StringReply:
-		apiRes.reply = "OKString"
-		apiRes.item = t.Value
+		apiRes.Reply = "OKString"
+		apiRes.Item = t.Value
 	case command.ErrResult:
-		apiRes.reply = "Error"
+		apiRes.Reply = "Error"
 	default:
-		apiRes.reply = "No api response"
+		apiRes.Reply = "No api response"
 	}
 	return apiRes
 }

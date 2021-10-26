@@ -2,7 +2,7 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
+	"encoding/gob"
 	"flag"
 	"fmt"
 	"net"
@@ -39,23 +39,23 @@ func main() {
 		}
 
 		go handleConnection(conn)
-		go sendMessage(conn)
+		// go sendMessage(conn)
 	}
 }
 
-func sendMessage(conn net.Conn) {
-	for {
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("> ")
-		text, _ := reader.ReadString('\n')
+// func sendMessage(conn net.Conn) {
+// 	for {
+// 		reader := bufio.NewReader(os.Stdin)
+// 		fmt.Print("> ")
+// 		text, _ := reader.ReadString('\n')
 
-		_, err := conn.Write([]byte(text))
-		if err != nil {
-			fmt.Println("Error writing to stream.")
-			break
-		}
-	}
-}
+// 		_, err := conn.Write([]byte(text))
+// 		if err != nil {
+// 			fmt.Println("Error writing to stream.")
+// 			break
+// 		}
+// 	}
+// }
 
 func handleConnection(conn net.Conn) {
 	remoteAddr := conn.RemoteAddr().String()
@@ -104,13 +104,11 @@ func handleMessage(message string, conn net.Conn) {
 			if cmd != nil {
 				res := cmd.Execute(args...)
 				apiRes := getApiResponseByResult(res)
-				apiResByt, err := json.Marshal(apiRes)
 
-				var apiResBytUncoded apiResponse
-				json.Unmarshal(apiResByt, apiResBytUncoded)
+				encoder := gob.NewEncoder(conn)
+				err := encoder.Encode(apiRes)
 
-				fmt.Println("Sending:>", apiResByt, err, apiRes, apiResBytUncoded)
-				conn.Write(apiResByt)
+				fmt.Println("Sending:>", apiRes, err)
 			} else {
 				conn.Write([]byte("Unrecognized command.\n"))
 			}

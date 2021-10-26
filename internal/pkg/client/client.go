@@ -2,12 +2,11 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
+	"encoding/gob"
 	"flag"
 	"fmt"
 	"net"
 	"os"
-	"regexp"
 	"strconv"
 	"time"
 )
@@ -16,9 +15,9 @@ var host = flag.String("host", "localhost", "The hostname or IP to connect to; d
 var port = flag.Int("port", 8000, "The port to connect to; defaults to 8000.")
 
 type apiResponse struct {
-	reply string
-	item  string
-	items []string
+	Reply string
+	Item  string
+	Items []string
 }
 
 func main() {
@@ -44,7 +43,7 @@ func main() {
 	msg := "/SET key1 value1\n"
 	fmt.Print(msg)
 	setAndGetData(conn, msg)
-
+	time.Sleep(1)
 	msg = "/GET key1\n"
 	fmt.Print(msg)
 	setAndGetData(conn, msg)
@@ -68,43 +67,10 @@ func setAndGetData(conn net.Conn, msg string) {
 
 func readConnection(conn net.Conn) {
 	for {
-		buf := make([]byte, 2048)
-		scanner, _ := conn.Read(buf)
-
-		var message apiResponse
-		json.Unmarshal(buf[:scanner], &message)
-		fmt.Println(">: ", message.reply, message.item)
-		// for {
-		// 	ok := scanner.Scan()
-		// 	text := scanner.Text()
-
-		// 	command := handleCommands(text)
-		// 	if !command {
-		// 		fmt.Printf("\b\b** %s\n> ", text)
-		// 	}
-
-		// 	if !ok {
-		// 		fmt.Println("Reached EOF on server connection.")
-		// 		return
-		// 	}
-		// }
+		dec := gob.NewDecoder(conn)
+		apiRes := &apiResponse{}
+		err := dec.Decode(apiRes)
+		fmt.Println(err)
+		fmt.Printf("*** %+v \n", apiRes)
 	}
-}
-
-func handleCommands(text string) bool {
-	r, err := regexp.Compile("^%.*%$")
-	if err == nil {
-		if r.MatchString(text) {
-
-			switch {
-			case text == "%quit%":
-				fmt.Println("\b\bServer is leaving. Hanging up.")
-				os.Exit(0)
-			}
-
-			return true
-		}
-	}
-
-	return false
 }
